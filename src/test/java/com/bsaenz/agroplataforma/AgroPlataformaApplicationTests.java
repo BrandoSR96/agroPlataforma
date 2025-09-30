@@ -1,4 +1,4 @@
-package com.bsaenz.agroPlataforma;
+package com.bsaenz.agroplataforma;
 
 import io.quarkus.test.junit.QuarkusTest;
 

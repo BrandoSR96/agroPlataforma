@@ -1,10 +1,13 @@
-package com.bsaenz.agroPlataforma.controller;
+package com.bsaenz.agroplataforma.controller;
 
-import com.bsaenz.agroPlataforma.dto.ProductoForm;
-import com.bsaenz.agroPlataforma.dto.ProductosDto;
-import com.bsaenz.agroPlataforma.model.Productos;
-import com.bsaenz.agroPlataforma.service.CloudinaryService;
-import com.bsaenz.agroPlataforma.service.ProductosService;
+import com.bsaenz.agroplataforma.dto.ProductoForm;
+import com.bsaenz.agroplataforma.dto.ProductosDto;
+import com.bsaenz.agroplataforma.model.Productos;
+import com.bsaenz.agroplataforma.service.CloudinaryService;
+import com.bsaenz.agroplataforma.service.ProductosService;
+import com.bsaenz.agroplataforma.util.MensajeProducto;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -35,7 +38,6 @@ public class ProductosController {
 
     @GET
     @Path("/listar")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerProductos() {
         List<ProductosDto> productosDto = productosService.getRepository().listAll()
                 .stream()
@@ -68,9 +70,8 @@ public class ProductosController {
                 form.cantidadDisponible == null ||
                 form.distrito == null || form.distrito.isBlank() ||
                 form.categoria == null || form.categoria.isBlank()) {
-
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Faltan campos obligatorios o la imagen no fue enviada correctamente.").build();
+                    .entity(MensajeProducto.ERROR_CAMPOS_OBLIGATORIOS).build();
         }
 
 
@@ -79,7 +80,6 @@ public class ProductosController {
             String urlImagen = cloudinaryService.subirImagen(archivo);
 
             Productos producto = new Productos();
-
             Instant ahora = Instant.now();
             producto.setCreadoEn(ahora);
             producto.setActualizadoEn(ahora);
@@ -92,20 +92,19 @@ public class ProductosController {
             producto.setCategoria(form.categoria);
             producto.setImagenUrl(urlImagen);
 
-
             productosService.getRepository().persist(producto);
             return Response.status(Response.Status.CREATED).entity(producto).build();
 
         } catch (IOException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error al subir la imagen: " + e.getMessage()).build();
+                    .entity(MensajeProducto.ERROR_SUBIDA_IMAGEN + e.getMessage()).build();
         }
-
     }
+
 
     public File convertirInputStreamAFile(InputStream inputStream) throws IOException {
         if (inputStream == null) {
-            throw new IllegalArgumentException("El InputStream no puede ser null");
+            throw new IllegalArgumentException(MensajeProducto.ERROR_INPUTSTREAM_NULL);
         }
 
         File tempFile = File.createTempFile("upload-", ".tmp");
@@ -129,7 +128,7 @@ public class ProductosController {
     public Response actualizarProducto(@PathParam("id") Long id, @MultipartForm ProductoForm form) {
         Productos producto = productosService.getRepository().findById(id);
         if (producto == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Producto no encontrado").build();
+            return Response.status(Response.Status.NOT_FOUND).entity(MensajeProducto.PRODUCTO_NO_ENCONTRADO).build();
         }
         try {
             if (form.imagen != null) {
@@ -160,14 +159,14 @@ public class ProductosController {
             producto.setActualizadoEn(Instant.now());
 
             Map<String, Object> respuesta = new HashMap<>();
-            respuesta.put("mensaje", "Producto actualizado correctamente");
+            respuesta.put("mensaje", MensajeProducto.PRODUCTO_ACTUALIZADO);
             respuesta.put("producto", producto);
 
             return Response.ok(respuesta).build();
 
         } catch (IOException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error al subir la imagen: " + e.getMessage()).build();
+                    .entity(MensajeProducto.ERROR_SUBIDA_IMAGEN + e.getMessage()).build();
         }
     }
 
@@ -181,7 +180,29 @@ public class ProductosController {
             return Response.status(Response.Status.NOT_FOUND).entity("Producto no encontrado").build();
         }
         productosService.getRepository().delete(producto);
-        return Response.ok("Producto eliminado correctamente").build();
+        return Response.ok(MensajeProducto.PRODUCTO_ELIMINADO).build();
     }
 
+    @GET
+    @Path("buscar/{id}")
+    @PermitAll
+    public Response obtenerProductoPorId(@PathParam("id") Long id) {
+        Productos producto = productosService.getRepository().findById(id);
+        if (producto == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity(MensajeProducto.PRODUCTO_NO_ENCONTRADO).build();
+        }
+        ProductosDto productoDto = new ProductosDto(
+                producto.getId(),
+                producto.getNombre(),
+                producto.getDescripcion(),
+                producto.getPrecio(),
+                producto.getCantidadDisponible(),
+                producto.getDistrito(),
+                producto.getCategoria(),
+                producto.getImagenUrl(),
+                producto.getCreadoEn(),
+                producto.getActualizadoEn()
+        );
+        return Response.ok(productoDto).build();
+    }
 }

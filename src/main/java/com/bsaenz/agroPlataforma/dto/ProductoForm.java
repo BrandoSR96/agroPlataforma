@@ -1,4 +1,4 @@
-package com.bsaenz.agroPlataforma.dto;
+package com.bsaenz.agroplataforma.dto;
 
 import jakarta.ws.rs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;

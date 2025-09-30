@@ -1,4 +1,4 @@
-package com.bsaenz.agroPlataforma.enums;
+package com.bsaenz.agroplataforma.enums;
 
 public enum Rol {
     USUARIO,

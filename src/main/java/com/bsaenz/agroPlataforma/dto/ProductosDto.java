@@ -1,4 +1,4 @@
-package com.bsaenz.agroPlataforma.dto;
+package com.bsaenz.agroplataforma.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.bsaenz.agroPlataforma.model;
+package com.bsaenz.agroplataforma.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

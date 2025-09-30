@@ -1,4 +1,4 @@
-package com.bsaenz.agroPlataforma.service;
+package com.bsaenz.agroplataforma.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

@@ -1,6 +1,6 @@
-package com.bsaenz.agroPlataforma.model;
+package com.bsaenz.agroplataforma.model;
 
-import com.bsaenz.agroPlataforma.enums.Rol;
+import com.bsaenz.agroplataforma.enums.Rol;
 import jakarta.persistence.*;
 import lombok.Data;
 

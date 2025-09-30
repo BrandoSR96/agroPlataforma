@@ -1,6 +1,6 @@
-package com.bsaenz.agroPlataforma.service;
+package com.bsaenz.agroplataforma.service;
 
-import com.bsaenz.agroPlataforma.repository.RepositoryProductos;
+import com.bsaenz.agroplataforma.repository.RepositoryProductos;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
